@@ -8,7 +8,7 @@ library("sigmoid")
 library("ggplot2")
 library("data.table")
 
-maxIterations = 500
+maxIterations = 100
 stepSize = 0.5
 
 ###############################################################################
@@ -238,13 +238,28 @@ getYTilda <- function( y )
 }
 
 #Function Name: programPlot
-#Algorithm: simplifies the program plotting process
-#Input
+#Algorithm: simplifies the program plotting process for the training vs
+#           validation % error and training vs validation mean log loss
+#Inputs:
+#NumIterVector: a list of 1:(maxIterations + 1), used for x-axis with plotting
+#trainErrorVector: vector of training error where trainErrorVector[i] is
+#                  the training error for the i'th observation
+#validatoinErrorVector: vector of validation error where validatoinErrorVector[i]
+#                       is the training error for the i'th observation
+#trainMeanLogLossVector: vector of training mean log loss where 
+#                        trainMeanLogLossVector[i] is the training error for
+#                        the i'th observation
+#validationMeanLogLossVector:
+#Outputs:
+#Val. vs Train Error %: Two line graphs on one plot. Red line is the validation
+#                       error percentage, black line is training error percentage
+#Mean Log Loss: Two line graphs on one plot. Red line is mean log loss for validation
+#               data and black line is mean log loss for training data
 programPlot <- function( numIterVector, trainErrorVector, validationErrorVector,
                          trainMeanLogLossVector, validationMeanLogLossVector )
 {
   #plot error percent
-  plot(numIterVector, trainErrorVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent")
+  plot(numIterVector, trainErrorVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent", ylim = range(0,1))
   lines(numIterVector, validationErrorVector, col = "red", lwd = 3)
   title("Val. vs Train Error %")
   legend(300,.35,c("Train","Validation"),lwd=c(3,3),col = c("black","red"), y.intersp=1.5)
@@ -252,11 +267,41 @@ programPlot <- function( numIterVector, trainErrorVector, validationErrorVector,
   points(which.min(trainErrorVector), min(trainErrorVector), cex = 2, col = 'black',pch=19)
   
   #plot log loss
-  plot(numIterVector, trainMeanLogLossVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent")
+  plot(numIterVector, trainMeanLogLossVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent", ylim = range(0,1))
   lines(numIterVector, validationMeanLogLossVector, col = "red", lwd = 3)
   title("Mean Log Loss")
   legend("topright",c("Train","Validation"),lwd=c(3,3),col = c("black","red"), y.intersp=1.5)
   points(which.min(validationMeanLogLossVector), min(validationMeanLogLossVector),cex = 2, col = 'red',pch=19)
   points(which.min(trainMeanLogLossVector), min(trainMeanLogLossVector), cex = 2, col = 'black',pch=19)
   
+}
+
+#Function Name: clean
+#Algorithm: Clean will "clean" our data set. It will remove
+#           any columns with a standard deviation of zero,
+#           which will break our data set if we run the
+#           scale function on it.
+clean <- function(X)
+{
+  #initialize column
+  column = 1
+  #go through every column in the X matrix
+  while(column <= ncol(X))
+  {
+    #if sd of column is 0, delete it and reset column to 1
+    if(sd(X[,column]) == 0)
+    {
+      #X <- X[,(-1 * column)] will return a matrix with every column except
+      #the column'th column
+      X <- X[,(-1 * column)]
+      column = 1
+    }
+    #if sd of column is nonzero, then iterate and go to next column
+    else
+    {
+      column = column + 1
+    }
+  }
+  #return clean matrix
+  X
 }
