@@ -7,6 +7,7 @@
 library("sigmoid")
 library("ggplot2")
 library("data.table")
+library("WeightedROC")
 
 maxIterations = 100
 stepSize = 0.5
@@ -40,11 +41,11 @@ GradientDescent <- function( X, y, stepSize, maxIterations )
   for( currIter in 1:maxIterations )
   {
     #find and store current weight
-    currWeight <- weightMatrix[,currIter]
+    weightVector <- weightMatrix[,currIter]
     
     #given the curren weight, and the data, find the new weight after
     #one iteration of gradient descent
-    newWeight <- findDescent( X, y, stepSize, currWeight )
+    newWeight <- findDescent( X, y, stepSize, weightVector )
     
     #bind the new weight vector to weightMatrix
     weightMatrix <- cbind( weightMatrix, cbind(matrix(newWeight,ncol(X),1)) )
@@ -256,23 +257,70 @@ getYTilda <- function( y )
 #Mean Log Loss: Two line graphs on one plot. Red line is mean log loss for validation
 #               data and black line is mean log loss for training data
 programPlot <- function( numIterVector, trainErrorVector, validationErrorVector,
-                         trainMeanLogLossVector, validationMeanLogLossVector )
+                         trainMeanLogLossVector, validationMeanLogLossVector, weightMatrix )
 {
-  #plot error percent
-  plot(numIterVector, trainErrorVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent", ylim = range(0,1))
-  lines(numIterVector, validationErrorVector, col = "red", lwd = 3)
-  title("Val. vs Train Error %")
-  legend(300,.35,c("Train","Validation"),lwd=c(3,3),col = c("black","red"), y.intersp=1.5)
-  points(which.min(validationErrorVector), min(validationErrorVector),cex = 2, col = 'red',pch=19)
-  points(which.min(trainErrorVector), min(trainErrorVector), cex = 2, col = 'black',pch=19)
+  #get mins for error percent
+  minTrainerror.x <- which.min(trainErrorVector)
+  minTrainerror.y <- min(trainErrorVector)
   
-  #plot log loss
-  plot(numIterVector, trainMeanLogLossVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent", ylim = range(0,1))
-  lines(numIterVector, validationMeanLogLossVector, col = "red", lwd = 3)
-  title("Mean Log Loss")
-  legend("topright",c("Train","Validation"),lwd=c(3,3),col = c("black","red"), y.intersp=1.5)
-  points(which.min(validationMeanLogLossVector), min(validationMeanLogLossVector),cex = 2, col = 'red',pch=19)
-  points(which.min(trainMeanLogLossVector), min(trainMeanLogLossVector), cex = 2, col = 'black',pch=19)
+  print(c("min value for error per train is at itteration:", minTrainerror.x))
+  
+  minValiderror.x <- which.min(validationErrorVector)
+  minValiderror.y <- min(validationErrorVector)
+  
+  print(c("min value for error per validation is at iteration:", minValiderror.x))
+  
+  
+  #plot the validation error with the training error on the same graph with respect
+  #to the number of iterations in the gradient descent
+  dataSetErrorPer.plot<-ggplot() +
+    geom_line(mapping=aes(1:ncol(weightMatrix),trainErrorVector,color="train")) +
+    labs(x="Number of Itertions", y="Error Percent") +
+    geom_line(mapping=aes(1:ncol(weightMatrix),validationErrorVector,color="validation")) +
+    geom_point(aes(x=minTrainerror.x, y=minTrainerror.y, color = "minTrain"))+
+    geom_point(aes(x=minValiderror.x, y=minValiderror.y,color = "minValid"))+
+    scale_color_manual(values=c(train="black", validation="red", minTrain ="black", minValid = "red"))
+  
+  print(dataSetErrorPer.plot)
+  
+  #get mins for mean log loss
+  minMLLtrain.x<- which.min(trainMeanLogLossVector)
+  minMLLtrain.y<- min(trainMeanLogLossVector)
+  
+  print(c("min value for mll train is at iteration:", minMLLtrain.x))
+  
+  minMLLvalid.x<- which.min(validationMeanLogLossVector)
+  minMLLvalid.y<- min(validationMeanLogLossVector)
+  
+  print(c("min value for mll validation is at iteration:", minMLLvalid.x))
+  
+  #plot the mean log loss from validation set and training with respect
+  #to the number of iterations in the gradient descent
+  dataSetMLL.plot<-ggplot() +
+    geom_line(mapping=aes(1:ncol(weightMatrix),trainMeanLogLossVector,color="train")) +
+    labs(x="Number of Itertions", y="Mean Log Loss") +
+    geom_line(mapping=aes(1:ncol(weightMatrix),validationMeanLogLossVector,color="validation")) +
+    geom_point(aes(x=minMLLtrain.x, y=minMLLtrain.y, color = "minTrain"))+
+    geom_point(aes(x=minMLLvalid.x, y=minMLLvalid.y,color = "minValid"))+
+    scale_color_manual(values=c(train="black", validation="red", minTrain ="black", minValid = "red"))
+  
+  print(dataSetMLL.plot)
+  
+  # #plot error percent
+  # plot(numIterVector, trainErrorVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent", ylim = range(0,.8))
+  # lines(numIterVector, validationErrorVector, col = "red", lwd = 3)
+  # title("Val. vs Train Error %")
+  # legend(300,.35,c("Train","Validation"),lwd=c(3,3),col = c("black","red"), y.intersp=1.5)
+  # points(which.min(validationErrorVector), min(validationErrorVector),cex = 2, col = 'red',pch=19)
+  # points(which.min(trainErrorVector), min(trainErrorVector), cex = 2, col = 'black',pch=19)
+  # 
+  # #plot log loss
+  # plot(numIterVector, trainMeanLogLossVector, type = 'l', col = "black", lwd = 3, xlab = "Number of Iterations", ylab = "Error Percent", ylim = range(0,.8))
+  # lines(numIterVector, validationMeanLogLossVector, col = "red", lwd = 3)
+  # title("Mean Log Loss")
+  # legend("topright",c("Train","Validation"),lwd=c(3,3),col = c("black","red"), y.intersp=1.5)
+  # points(which.min(validationMeanLogLossVector), min(validationMeanLogLossVector),cex = 2, col = 'red',pch=19)
+  # points(which.min(trainMeanLogLossVector), min(trainMeanLogLossVector), cex = 2, col = 'black',pch=19)
   
 }
 

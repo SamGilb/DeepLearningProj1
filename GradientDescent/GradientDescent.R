@@ -162,50 +162,11 @@ for(i in 1:(maxIterations+1))
 plot(1:501, trainMeanLogLossVector)
 plot(1:501, validationMeanLogLossVector)
 
-#get mins for error percent
-minTrainerror.x <- which.min(trainErrorVector)
-minTrainerror.y <- min(trainErrorVector)
+ggplot() +
+  geom_smooth(mapping=aes(1:ncol(weightMatrix),trainErrorVector),color = 'red') +
+  labs(X="Number of Iterations") +
+  geom_smooth(mapping=aes(1:ncol(weightMatrix),validationErrorVector), color = 'black') +
+  labs(X="Number of Iterations")
 
-print("min value for errorper train is at itteration:", minValiderror.x)
-
-minValiderror.x <- which.min(validationErrorVector)
-minValiderror.y <- min(validationErrorVector)
-
-print("min value for errorper validation is at iteration:", minValiderror.x)
-
-
-#plot the validation error with the training error on the same graph with respect
-#to the number of iterations in the gradient descent
-thirdSetErrorPer.plot<-ggplot() +
-  geom_line(mapping=aes(1:ncol(weightMatrix),trainErrorVector,color="train")) +
-  labs(x="Number of Itertions", y="Error Percent") +
-  geom_line(mapping=aes(1:ncol(weightMatrix),validationErrorVector,color="validation")) +
-  geom_point(aes(x=minTrainerror.x, y=minTrainerror.y, color = "min"))+
-  geom_point(aes(x=minValiderror.x, y=minValiderror.y,color = "min"))+
-  scale_color_manual(values=c(train="black", validation="red", min ="blue"))
-
-print(thirdSetErrorPer.plot)
-
-#get mins for mean log loss
-minMLLtrain.x<- which.min(trainMeanLogLossVector)
-minMLLtrain.y<- min(trainMeanLogLossVector)
-
-print("min value for mll train is at iteration:", minMLLvalid.x)
-
-minMLLvalid.x<- which.min(validationMeanLogLossVector)
-minMLLvalid.y<- min(validationMeanLogLossVector)
-
-print("min value for mll validation is at iteration:", minMLLvalid.x)
-
-#plot the mean log loss from validation set and training with respect
-#to the number of iterations in the gradient descent
-thirdSetMLL.plot<-ggplot() +
-  geom_line(mapping=aes(1:ncol(weightMatrix),trainMeanLogLossVector,color="train")) +
-  labs(x="Number of Itertions", y="Mean Log Loss") +
-  geom_line(mapping=aes(1:ncol(weightMatrix),validationMeanLogLossVector,color="validation")) +
-  geom_point(aes(x=minMLLtrain.x, y=minMLLtrain.y, color = "min"))+
-  geom_point(aes(x=minMLLvalid.x, y=minMLLvalid.y,color = "min"))+
-  scale_color_manual(values=c(train="black", validation="red", min ="blue"))
-
-print(thirdSetMLL.plot)
-
+errorMatrix <- cbind(trainErrorVector,validationErrorVector)
+ggplot(data = )
