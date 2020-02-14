@@ -353,3 +353,23 @@ clean <- function(X)
   #return clean matrix
   X
 }
+
+#Function Name: predictY
+#Algorithm: forms a y.hat vector that represents the predicted y value
+#           given a output y vector, X data matrix, and predWeight predicted
+#           weight.
+#Inputs:
+#y: data output
+#X: data matrix
+#predWeight: best set of predicted weights
+#p: p value for which we classify a y as a 1, standard is 0.5
+#Outputs:
+#y.hat: vector of predicted values for y
+predictY <- function( y, X, predWeight, p = 0.5 )
+{
+  #calculate y.hat using a combination sigmoid and round functions
+  y.hat <- round(sigmoid(X %*% predWeight) + (.5-p))
+  
+  #return y.hat
+  y.hat
+}

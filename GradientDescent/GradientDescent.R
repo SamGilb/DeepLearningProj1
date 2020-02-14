@@ -1,11 +1,11 @@
 
-
 main <- function()
 {
   #library and helper function
   source("GradientDescentHelper.R")
+  set.seed(8)
   
-  #initialize
+  #initialize global variables
   numIterVector = 1:(maxIterations + 1)
   
   #############################################################################
@@ -77,6 +77,26 @@ main <- function()
   #plot how %error and mean log loss for data set
   programPlot(numIterVector,trainErrorVector,validationErrorVector,trainMeanLogLossVector,validationMeanLogLossVector, weightMatrix)
   
+  #ROC curve implementation
+  TPR <- NA
+  FPR <- NA
+  for(p in 1:10000)
+  {
+    y.hat <- predictY(y_test, X_test, weightMatrix[,which.min(testErrorVector)], (p/10000))
+    ROC.df <- WeightedROC(y.hat,y_test)
+    TPR[p] <- ROC.df[2,'TPR']
+    FPR[p] <- ROC.df[2,'FPR']
+  }
+  
+  roctest<- ggplot()+
+    geom_path(aes(x=FPR, y=TPR, color="ROC"))+
+    geom_path(aes(x=c(0,1),y=c(0,1), color="base"))+
+    scale_color_manual(values=c(ROC="blue", base="violet"))+
+    labs(color="model")
+   
+   
+ 
+  print(roctest)
   #############################################################################
   #############################################################################
   #                              Second Data Set                              #
@@ -149,6 +169,26 @@ main <- function()
   #plot how %error and mean log loss for data set
   programPlot(numIterVector,trainErrorVector,validationErrorVector,trainMeanLogLossVector,validationMeanLogLossVector, weightMatrix)
   
+  #ROC curve implementation
+  TPR <- NA
+  FPR <- NA
+  for(p in 1:100)
+  {
+    y.hat <- predictY(y_test, X_test, weightMatrix[,which.min(testErrorVector)], (p/100))
+    ROC.df <- WeightedROC(y.hat,y_test)
+    TPR[p] <- ROC.df[2,'TPR']
+    FPR[p] <- ROC.df[2,'FPR']
+  }
+  
+  roctest<- ggplot()+
+    geom_line(aes(x=FPR, y=TPR, color="ROC"))+
+    geom_path(aes(x=c(0,1),y=c(0,1), color="base"))+
+    scale_color_manual(values=c(ROC="blue", base="violet"))+
+    labs(color="model")
+  
+  
+  
+  print(roctest)
   #############################################################################
   #############################################################################
   #                             Third Data Set                                #
@@ -218,6 +258,27 @@ main <- function()
   
   #plot how %error and mean log loss for data set
   programPlot(numIterVector,trainErrorVector,validationErrorVector,trainMeanLogLossVector,validationMeanLogLossVector, weightMatrix)
+  
+  #ROC curve implementation
+  TPR <- NA
+  FPR <- NA
+  for(p in 1:10000)
+  {
+    y.hat <- predictY(y_test, X_test, weightMatrix[,which.min(testErrorVector)], (p/10000))
+    ROC.df <- WeightedROC(y.hat,y_test)
+    TPR[p] <- ROC.df[2,'TPR']
+    FPR[p] <- ROC.df[2,'FPR']
+  }
+  
+  roctest<- ggplot()+
+    geom_path(aes(x=FPR, y=TPR, color="ROC"))+
+    geom_path(aes(x=c(0,1),y=c(0,1), color="base"))+
+    scale_color_manual(values=c(ROC="blue", base="violet"))+
+    labs(color="model")
+  
+  
+  
+  print(roctest)
   
   #Return a weightMatrix
   weightMatrix
