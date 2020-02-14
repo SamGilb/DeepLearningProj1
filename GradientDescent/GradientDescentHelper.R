@@ -275,11 +275,11 @@ programPlot <- function( numIterVector, trainErrorVector, validationErrorVector,
   #to the number of iterations in the gradient descent
   dataSetErrorPer.plot<-ggplot() +
     geom_line(mapping=aes(1:ncol(weightMatrix),trainErrorVector,color="train")) +
-    labs(x="Number of Itertions", y="Error Percent") +
+    labs(x="Number of Itertions", y="Error Percent", color = "set") +
     geom_line(mapping=aes(1:ncol(weightMatrix),validationErrorVector,color="validation")) +
-    geom_point(aes(x=minTrainerror.x, y=minTrainerror.y, color = "minTrain"))+
-    geom_point(aes(x=minValiderror.x, y=minValiderror.y,color = "minValid"))+
-    scale_color_manual(values=c(train="black", validation="red", minTrain ="black", minValid = "red"))
+    geom_point(aes(x=minTrainerror.x, y=minTrainerror.y), color = "black")+
+    geom_point(aes(x=minValiderror.x, y=minValiderror.y), color = "red")+
+    scale_color_manual(values=c(train="black", validation="red"))
   
   print(dataSetErrorPer.plot)
   
@@ -298,11 +298,11 @@ programPlot <- function( numIterVector, trainErrorVector, validationErrorVector,
   #to the number of iterations in the gradient descent
   dataSetMLL.plot<-ggplot() +
     geom_line(mapping=aes(1:ncol(weightMatrix),trainMeanLogLossVector,color="train")) +
-    labs(x="Number of Itertions", y="Mean Log Loss") +
+    labs(x="Number of Itertions", y="Mean Log Loss", color = "set") +
     geom_line(mapping=aes(1:ncol(weightMatrix),validationMeanLogLossVector,color="validation")) +
-    geom_point(aes(x=minMLLtrain.x, y=minMLLtrain.y, color = "minTrain"))+
-    geom_point(aes(x=minMLLvalid.x, y=minMLLvalid.y,color = "minValid"))+
-    scale_color_manual(values=c(train="black", validation="red", minTrain ="black", minValid = "red"))
+    geom_point(aes(x=minMLLtrain.x, y=minMLLtrain.y), color = "black")+
+    geom_point(aes(x=minMLLvalid.x, y=minMLLvalid.y), color = "red")+
+    scale_color_manual(values=c(train="black", validation="red"))
   
   print(dataSetMLL.plot)
   

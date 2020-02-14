@@ -1,7 +1,10 @@
-source("GradientDescentHelper.R")
+
 
 main <- function()
 {
+  #library and helper function
+  source("GradientDescentHelper.R")
+  
   #initialize
   numIterVector = 1:(maxIterations + 1)
   
