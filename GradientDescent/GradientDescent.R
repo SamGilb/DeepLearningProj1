@@ -1,6 +1,6 @@
 
-main <- function()
-{
+#main <- function()
+#{
   #library and helper function
   source("GradientDescentHelper.R")
   set.seed(8)
@@ -282,8 +282,8 @@ main <- function()
   
   #Return a weightMatrix
   weightMatrix
-}
+#}
 
 #run this big boy
-weightMatrix <- main()
+#weightMatrix <- main()
 
